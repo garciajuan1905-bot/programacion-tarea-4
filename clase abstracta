@@ -1,0 +1,41 @@
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
+
+# 1. Definición de la Clase Abstracta
+class RecursoBiblioteca(ABC):
+    def __init__(self, titulo, codigo):
+        self.titulo = titulo
+        self.codigo = codigo
+        self.fecha_prestamo = datetime.now()
+
+    @abstractmethod
+    def calcular_fecha_devolucion(self):
+        """Obliga a cada tipo de recurso a definir su plazo de entrega."""
+        pass
+
+    def imprimir_recibo(self):
+        """Método común para todos los recursos."""
+        fecha = self.calcular_fecha_devolucion()
+        print(f"RECIBO: '{self.titulo}' (Código: {self.codigo})")
+        print(f"Debe devolverse el: {fecha.strftime('%d/%m/%Y')}\n")
+
+# 2. Implementación de subclases concretas
+class Libro(RecursoBiblioteca):
+    def calcular_fecha_devolucion(self):
+        # Los libros se prestan por 15 días
+        return self.fecha_prestamo + timedelta(days=15)
+
+class Revista(RecursoBiblioteca):
+    def calcular_fecha_devolucion(self):
+        # Las revistas se prestan solo por 3 días
+        return self.fecha_prestamo + timedelta(days=3)
+
+# 3. Ejecución del ejercicio
+if __name__ == "__main__":
+    # Creamos instancias de las clases hijas
+    mi_libro = Libro("Cien años de soledad", "L-001")
+    mi_revista = Revista("National Geographic", "R-202")
+
+    print("--- Proceso de Préstamo ---")
+    mi_libro.imprimir_recibo()
+    mi_revista.imprimir_recibo()
