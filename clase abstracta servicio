@@ -1,0 +1,82 @@
+from abc import ABC, abstractmethod
+
+# 1. Definición de la Clase Abstracta
+class Servicio(ABC):
+    def __init__(self, nombre_cliente, duracion_horas):
+        self.nombre_cliente = nombre_cliente
+        self.duracion_horas = duracion_horas
+
+    @abstractmethod
+    def calcular_costo(self):
+        """Método abstracto para calcular el costo."""
+        pass
+
+    @abstractmethod
+    def describir_servicio(self):
+        """Método abstracto para describir el servicio."""
+        pass
+
+    def validar_parametros(self):
+        """Método concreto para validar datos comunes."""
+        if self.duracion_horas <= 0:
+            raise ValueError("La duración debe ser mayor a cero.")
+        return True
+
+# 2. Servicios Especializados (Heredan de Servicio)
+
+class ServicioLimpieza(Servicio):
+    TARIFAS_HORA = 50.0
+
+    def calcular_costo(self):
+        self.validar_parametros()
+        return self.duracion_horas * self.TARIFAS_HORA
+
+    def describir_servicio(self):
+        return f"Limpieza profunda para {self.nombre_cliente}"
+
+class ServicioConsultoria(Servicio):
+    TARIFAS_HORA = 150.0
+
+    def calcular_costo(self):
+        self.validar_parametros()
+        # Ejemplo de lógica especializada: costo mínimo
+        return max(100.0, self.duracion_horas * self.TARIFAS_HORA)
+
+    def describir_servicio(self):
+        return f"Consultoría estratégica para {self.nombre_cliente}"
+
+class ServicioMantenimiento(Servicio):
+    TARIFAS_HORA = 80.0
+
+    def calcular_costo(self):
+        self.validar_parametros()
+        return self.duracion_horas * self.TARIFAS_HORA
+
+    def describir_servicio(self):
+        return f"Mantenimiento preventivo para {self.nombre_cliente}"
+
+# 3. Implementación de Polimorfismo
+def mostrar_detalle_servicio(servicio: Servicio):
+    """
+    Función polimórfica: acepta cualquier objeto que sea 'Servicio'.
+    No necesita saber qué tipo de servicio es, solo que tiene
+    los métodos calcular_costo y describir_servicio.
+    """
+    print(f"--- Detalle ---")
+    print(f"Cliente: {servicio.nombre_cliente}")
+    print(f"Servicio: {servicio.describir_servicio()}")
+    print(f"Costo Total: ${servicio.calcular_costo():.2f}")
+    print("-" * 15)
+
+# --- Uso del código ---
+if __name__ == "__main__":
+    # Creación de instancias de servicios específicos
+    limpieza = ServicioLimpieza("Empresa A", 5)
+    consultoria = ServicioConsultoria("Empresa B", 2)
+    mantenimiento = ServicioMantenimiento("Empresa C", 10)
+
+    # Lista de servicios para demostrar polimorfismo
+    servicios = [limpieza, consultoria, mantenimiento]
+
+    for serv in servicios:
+        mostrar_detalle_servicio(serv)
