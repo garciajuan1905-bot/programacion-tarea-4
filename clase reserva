@@ -1,0 +1,73 @@
+class ReservaError(Exception):
+    """Excepción personalizada para errores en el proceso de reserva."""
+    pass
+
+class Reserva:
+    # Estados posibles de la reserva
+    ESTADO_PENDIENTE = "Pendiente"
+    ESTADO_CONFIRMADA = "Confirmada"
+    ESTADO_CANCELADA = "Cancelada"
+    ESTADO_PROCESADA = "Procesada"
+
+    def __init__(self, cliente, servicio, duracion_horas):
+        self.cliente = cliente
+        self.servicio = servicio
+        self.duracion_horas = duracion_horas
+        self.estado = self.ESTADO_PENDIENTE
+        print(f"Reserva creada para {self.cliente}: {self.servicio} ({self.duracion_horas}h) - Estado: {self.estado}")
+
+    def confirmar(self):
+        """Cambia el estado a confirmado si estaba pendiente."""
+        try:
+            if self.estado == self.ESTADO_PENDIENTE:
+                self.estado = self.ESTADO_CONFIRMADA
+                print(f"✅ Reserva de {self.cliente} confirmada.")
+            else:
+                raise ReservaError(f"No se puede confirmar una reserva en estado: {self.estado}")
+        except ReservaError as e:
+            print(f"❌ Error al confirmar: {e}")
+
+    def cancelar(self):
+        """Cancela la reserva si no está procesada."""
+        try:
+            if self.estado == self.ESTADO_PROCESADA:
+                raise ReservaError("No se puede cancelar una reserva ya procesada.")
+            
+            self.estado = self.ESTADO_CANCELADA
+            print(f"⚠️ Reserva de {self.cliente} cancelada.")
+        except ReservaError as e:
+            print(f"❌ Error al cancelar: {e}")
+
+    def procesar(self):
+        """Procesa la reserva (solo si está confirmada)."""
+        try:
+            if self.estado != self.ESTADO_CONFIRMADA:
+                raise ReservaError(f"Solo se pueden procesar reservas confirmadas. Estado actual: {self.estado}")
+            
+            self.estado = self.ESTADO_PROCESADA
+            print(f"🚀 Reserva de {self.cliente} procesada con éxito.")
+        except ReservaError as e:
+            print(f"❌ Error al procesar: {e}")
+
+    def __str__(self):
+        return f"[Cliente: {self.cliente} | Servicio: {self.servicio} | Estado: {self.estado}]"
+
+# ==========================================
+# Ejemplo de uso con manejo de excepciones
+# ==========================================
+
+# 1. Creación de reservas
+r1 = Reserva("Ana García", "Limpieza Facial", 1.5)
+r2 = Reserva("Luis Pérez", "Masaje", 2)
+
+print("\n--- Pruebas de Flujo Correcto ---")
+r1.confirmar()
+r1.procesar()
+
+print("\n--- Pruebas de Manejo de Excepciones ---")
+r2.cancelar()
+r2.procesar() # Esto debería lanzar un error porque está cancelada
+
+print("\n--- Estado Final de las Reservas ---")
+print(r1)
+print(r2)
